@@ -40,6 +40,7 @@ impl SyncJob for RealSyncJob {
     fn run(&self) {
         loop {
             if self.shutdown.load(Relaxed) {
+                println!("shutdown marker set. exiting");
                 break;
             }
             std::thread::sleep(Duration::from_secs(1));
@@ -54,10 +55,14 @@ impl SyncJob for RealSyncJob {
         let shutdown_complete = self.shutdown_complete.clone();
         let task_runner = self.task_runner.clone();
         std::thread::spawn(move || {
+            println!("preparing to shutdown task runner");
             rt.block_on(task_runner.shutdown());
+            println!("task runner shut down; preparing to wait for completion notification");
             rt.block_on(async { shutdown_complete.notified().await });
+            println!("complete notification received");
         })
         .join()
         .unwrap();
+        println!("shutdown complete");
     }
 }
