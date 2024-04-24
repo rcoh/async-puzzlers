@@ -1,0 +1,2 @@
+# The suspicious stalled shutdown situation
+This crate is derived from an example lifted from real code. A signal handler is installed to trigger a clean shutdown on CTRL+C. The application hangs when `CTRL+C` is pressed. Can you figure out why?
